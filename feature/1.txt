@@ -1,1 +1,3 @@
 menambahkan feature 1
+
+menambahkan feature 1 ke 2
