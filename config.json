@@ -1,0 +1,7 @@
+{
+  "app" : {
+    "name" : "git_test",
+    "author" : "reo sahobby",
+    "port" : 4000
+  }
+}
