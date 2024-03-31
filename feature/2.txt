@@ -4,3 +4,4 @@ feature 2 add register
 
 feature 2 add new login
 feature 2 add new forgot password
+feature 2 add new otp send to email
