@@ -2,6 +2,7 @@
   "app" : {
     "name" : "git_test",
     "author" : "reo sahobby",
-    "port" : 4000
+    "port" : 4000,
+    "host" : "172.100.100.200"
   }
 }
