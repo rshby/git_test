@@ -1,6 +1,9 @@
 menambahkan feature pertama di branch feature/dev/5
 menambahkan feature kedua di branch feature/dev/5
+<<<<<<< .merge_file_4Mqj3F
 <<<<<<< HEAD
 menambahkan feature ketiga di branch feature/dev/5
 =======
 >>>>>>> 4000537bdf6e6fa62fe3e5575840022b65d49dec
+=======
+>>>>>>> .merge_file_vdFSrL
