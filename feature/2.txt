@@ -3,3 +3,4 @@ ini add new feature 2
 feature 2 add register
 
 feature 2 add new login
+feature 2 add new forgot password
