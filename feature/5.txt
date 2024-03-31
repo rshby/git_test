@@ -3,3 +3,4 @@ menambahkan feature kedua di branch feature/dev/5
 menambahkan feature ketiga di branch feature/dev/5
 menambahkan feature keempat di branch feature/dev/5
 menambahkan feature kelima di branch feature/dev/5
+menambahkan feature keenam di brnanch feature/dev/5
