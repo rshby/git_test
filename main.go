@@ -20,6 +20,15 @@ func main() {
 		Handler: app,
 	}
 
+	app.GET("/ping", func(c *gin.Context) {
+		statusCode := http.StatusOK
+		c.Status(statusCode)
+		c.JSON(statusCode, gin.H{
+			"status_code": statusCode,
+			"message":     "pong!",
+		})
+	})
+
 	if err := server.ListenAndServe(); err != nil {
 		logrus.Fatal(err)
 	}
