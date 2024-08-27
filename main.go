@@ -32,6 +32,8 @@ func main() {
 	// satu
 	// dua
 	// tiga
+	// 4
+	// 5
 
 	if err := server.ListenAndServe(); err != nil {
 		logrus.Fatal(err)
