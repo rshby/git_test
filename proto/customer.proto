@@ -1,0 +1,44 @@
+syntax = "proto3";
+
+package git_test.proto;
+
+option go_package = "/pb";
+
+// Define the Customer message
+message Customer {
+  int32 id = 1;           // Unique identifier for the customer
+  string name = 2;         // Name of the customer
+  string email = 3;        // Email of the customer
+  string phone = 4;        // Phone number of the customer
+  string address = 5;      // Address of the customer
+}
+
+// Request for CreateCustomer
+message CreateCustomerRequest {
+  string name = 2;         // Name of the customer
+  string email = 3;        // Email of the customer
+  string phone = 4;        // Phone number of the customer
+  string address = 5;   // Customer details
+}
+
+// Response for CreateCustomer
+message CreateCustomerResponse {
+  string id = 1;           // ID of the created customer
+  string message = 2;      // Status message
+}
+
+// Request for GetCustomerByEmail
+message GetCustomerByEmailRequest {
+  string email = 1;        // Email of the customer to retrieve
+}
+
+// Response for GetCustomerByEmail
+message GetCustomerByEmailResponse {
+  Customer customer = 1;   // Customer details
+}
+
+// Define the Customer service
+service CustomerService {
+  rpc CreateCustomer(CreateCustomerRequest) returns (CreateCustomerResponse);
+  rpc GetCustomerByEmail(GetCustomerByEmailRequest) returns (GetCustomerByEmailResponse);
+}
