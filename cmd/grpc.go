@@ -1,6 +1,7 @@
 package main
 
 import (
+	"git_test/interceptor"
 	"git_test/internal/service"
 	"git_test/proto/pb"
 	"github.com/sirupsen/logrus"
@@ -16,7 +17,9 @@ func main() {
 	}
 
 	// create new gRpc server
-	srv := grpc.NewServer()
+	srv := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(interceptor.WithLogInterceptor(), interceptor.WithErrorInterceptor()),
+	)
 
 	// create new instance service
 	customerService := service.NewCustomerService()

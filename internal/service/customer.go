@@ -18,6 +18,10 @@ func NewCustomerService() pb.CustomerServiceServer {
 func (c *customerService) GetCustomerByEmail(ctx context.Context, request *pb.GetCustomerByEmailRequest) (*pb.GetCustomerByEmailResponse, error) {
 	logrus.Infof("receive email from request : [%s]", request.GetEmail())
 
+	if request.GetEmail() == "error" {
+		return nil, ErrCustomerNotFound
+	}
+
 	return &pb.GetCustomerByEmailResponse{
 		Customer: &pb.Customer{
 			Id:      1,
