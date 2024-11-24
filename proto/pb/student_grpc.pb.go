@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	StudentService_RegisterStudent_FullMethodName = "/git_test.proto.StudentService/RegisterStudent"
-	StudentService_GetStudentByID_FullMethodName  = "/git_test.proto.StudentService/GetStudentByID"
+	StudentService_RegisterStudent_FullMethodName      = "/git_test.proto.StudentService/RegisterStudent"
+	StudentService_GetStudentByID_FullMethodName       = "/git_test.proto.StudentService/GetStudentByID"
+	StudentService_GetStudentBySchoolID_FullMethodName = "/git_test.proto.StudentService/GetStudentBySchoolID"
 )
 
 // StudentServiceClient is the client API for StudentService service.
@@ -29,6 +30,7 @@ const (
 type StudentServiceClient interface {
 	RegisterStudent(ctx context.Context, in *CreateStudentRequestDTO, opts ...grpc.CallOption) (*CreateStudentResponseDTO, error)
 	GetStudentByID(ctx context.Context, in *GetStudentByIDRequestDTO, opts ...grpc.CallOption) (*Student, error)
+	GetStudentBySchoolID(ctx context.Context, in *GetStudentBySchoolIDRequestDTO, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Student], error)
 }
 
 type studentServiceClient struct {
@@ -59,12 +61,32 @@ func (c *studentServiceClient) GetStudentByID(ctx context.Context, in *GetStuden
 	return out, nil
 }
 
+func (c *studentServiceClient) GetStudentBySchoolID(ctx context.Context, in *GetStudentBySchoolIDRequestDTO, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Student], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &StudentService_ServiceDesc.Streams[0], StudentService_GetStudentBySchoolID_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[GetStudentBySchoolIDRequestDTO, Student]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type StudentService_GetStudentBySchoolIDClient = grpc.ServerStreamingClient[Student]
+
 // StudentServiceServer is the server API for StudentService service.
 // All implementations must embed UnimplementedStudentServiceServer
 // for forward compatibility.
 type StudentServiceServer interface {
 	RegisterStudent(context.Context, *CreateStudentRequestDTO) (*CreateStudentResponseDTO, error)
 	GetStudentByID(context.Context, *GetStudentByIDRequestDTO) (*Student, error)
+	GetStudentBySchoolID(*GetStudentBySchoolIDRequestDTO, grpc.ServerStreamingServer[Student]) error
 	mustEmbedUnimplementedStudentServiceServer()
 }
 
@@ -80,6 +102,9 @@ func (UnimplementedStudentServiceServer) RegisterStudent(context.Context, *Creat
 }
 func (UnimplementedStudentServiceServer) GetStudentByID(context.Context, *GetStudentByIDRequestDTO) (*Student, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetStudentByID not implemented")
+}
+func (UnimplementedStudentServiceServer) GetStudentBySchoolID(*GetStudentBySchoolIDRequestDTO, grpc.ServerStreamingServer[Student]) error {
+	return status.Errorf(codes.Unimplemented, "method GetStudentBySchoolID not implemented")
 }
 func (UnimplementedStudentServiceServer) mustEmbedUnimplementedStudentServiceServer() {}
 func (UnimplementedStudentServiceServer) testEmbeddedByValue()                        {}
@@ -138,6 +163,17 @@ func _StudentService_GetStudentByID_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _StudentService_GetStudentBySchoolID_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(GetStudentBySchoolIDRequestDTO)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(StudentServiceServer).GetStudentBySchoolID(m, &grpc.GenericServerStream[GetStudentBySchoolIDRequestDTO, Student]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type StudentService_GetStudentBySchoolIDServer = grpc.ServerStreamingServer[Student]
+
 // StudentService_ServiceDesc is the grpc.ServiceDesc for StudentService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -154,6 +190,12 @@ var StudentService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _StudentService_GetStudentByID_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "GetStudentBySchoolID",
+			Handler:       _StudentService_GetStudentBySchoolID_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "proto/student.proto",
 }

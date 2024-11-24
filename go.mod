@@ -8,6 +8,7 @@ require (
 	github.com/banzaicloud/logrus-runtime-formatter v0.0.0-20190729070250-5ae5475bae5e
 	github.com/gin-gonic/gin v1.10.0
 	github.com/sirupsen/logrus v1.9.3
+	golang.org/x/sync v0.8.0
 	google.golang.org/grpc v1.68.0
 	google.golang.org/protobuf v1.34.2
 )

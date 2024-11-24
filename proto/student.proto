@@ -29,7 +29,12 @@ message GetStudentByIDRequestDTO {
   int32 id = 1;
 }
 
+message GetStudentBySchoolIDRequestDTO {
+  int32 schoolID = 1;
+}
+
 service StudentService {
   rpc RegisterStudent (CreateStudentRequestDTO) returns (CreateStudentResponseDTO);
   rpc GetStudentByID (GetStudentByIDRequestDTO) returns (Student);
+  rpc GetStudentBySchoolID(GetStudentBySchoolIDRequestDTO) returns (stream Student);
 }
