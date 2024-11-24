@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package git_test.proto;
+
+option go_package = "/pb";
+
+message Student {
+  int32 id = 1;           // Unique identifier for the customer
+  string name = 2;         // Name of the customer
+  string email = 3;        // Email of the customer
+  string phone = 4;        // Phone number of the customer
+  string address = 5;      // Address of the customer
+  string school = 6;
+}
+
+message CreateStudentRequestDTO {
+  string name = 1;
+  string email = 2;
+  string phone = 3;
+  string address = 4;
+  string school = 5;
+}
+
+message CreateStudentResponseDTO {
+  string message = 1;
+}
+
+message GetStudentByIDRequestDTO {
+  int32 id = 1;
+}
+
+service StudentService {
+  rpc RegisterStudent (CreateStudentRequestDTO) returns (CreateStudentResponseDTO);
+  rpc GetStudentByID (GetStudentByIDRequestDTO) returns (Student);
+}
