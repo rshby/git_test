@@ -4,6 +4,8 @@ package git_test.proto;
 
 option go_package = "/pb";
 
+import "proto/google/api/annotations.proto";
+
 // Define the Customer message
 message Customer {
   int32 id = 1;           // Unique identifier for the customer
@@ -37,8 +39,17 @@ message GetCustomerByEmailResponse {
   Customer customer = 1;   // Customer details
 }
 
+message GetCustomerByIDRequest {
+    int32 id = 1;
+}
+
 // Define the Customer service
 service CustomerService {
   rpc CreateCustomer(CreateCustomerRequest) returns (CreateCustomerResponse);
   rpc GetCustomerByEmail(GetCustomerByEmailRequest) returns (GetCustomerByEmailResponse);
+  rpc GetCustomerByID(GetCustomerByIDRequest) returns (Customer) {
+    option(google.api.http) = {
+      get: "/customer/{id}"
+    };
+  }
 }

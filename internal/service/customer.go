@@ -37,3 +37,14 @@ func (c *customerService) CreateCustomer(ctx context.Context, request *pb.Create
 	//TODO implement me
 	panic("implement me")
 }
+
+// GetCustomerByID is method to get customer by id
+func (c *customerService) GetCustomerByID(ctx context.Context, request *pb.GetCustomerByIDRequest) (*pb.Customer, error) {
+	return &pb.Customer{
+		Id:      request.GetId(),
+		Name:    "Reo",
+		Email:   "reoshby@gmail.com",
+		Phone:   "081",
+		Address: "Jakarta Selatan",
+	}, nil
+}

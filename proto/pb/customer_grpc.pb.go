@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion9
 const (
 	CustomerService_CreateCustomer_FullMethodName     = "/git_test.proto.CustomerService/CreateCustomer"
 	CustomerService_GetCustomerByEmail_FullMethodName = "/git_test.proto.CustomerService/GetCustomerByEmail"
+	CustomerService_GetCustomerByID_FullMethodName    = "/git_test.proto.CustomerService/GetCustomerByID"
 )
 
 // CustomerServiceClient is the client API for CustomerService service.
@@ -31,6 +32,7 @@ const (
 type CustomerServiceClient interface {
 	CreateCustomer(ctx context.Context, in *CreateCustomerRequest, opts ...grpc.CallOption) (*CreateCustomerResponse, error)
 	GetCustomerByEmail(ctx context.Context, in *GetCustomerByEmailRequest, opts ...grpc.CallOption) (*GetCustomerByEmailResponse, error)
+	GetCustomerByID(ctx context.Context, in *GetCustomerByIDRequest, opts ...grpc.CallOption) (*Customer, error)
 }
 
 type customerServiceClient struct {
@@ -61,6 +63,16 @@ func (c *customerServiceClient) GetCustomerByEmail(ctx context.Context, in *GetC
 	return out, nil
 }
 
+func (c *customerServiceClient) GetCustomerByID(ctx context.Context, in *GetCustomerByIDRequest, opts ...grpc.CallOption) (*Customer, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(Customer)
+	err := c.cc.Invoke(ctx, CustomerService_GetCustomerByID_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CustomerServiceServer is the server API for CustomerService service.
 // All implementations must embed UnimplementedCustomerServiceServer
 // for forward compatibility.
@@ -69,6 +81,7 @@ func (c *customerServiceClient) GetCustomerByEmail(ctx context.Context, in *GetC
 type CustomerServiceServer interface {
 	CreateCustomer(context.Context, *CreateCustomerRequest) (*CreateCustomerResponse, error)
 	GetCustomerByEmail(context.Context, *GetCustomerByEmailRequest) (*GetCustomerByEmailResponse, error)
+	GetCustomerByID(context.Context, *GetCustomerByIDRequest) (*Customer, error)
 	mustEmbedUnimplementedCustomerServiceServer()
 }
 
@@ -84,6 +97,9 @@ func (UnimplementedCustomerServiceServer) CreateCustomer(context.Context, *Creat
 }
 func (UnimplementedCustomerServiceServer) GetCustomerByEmail(context.Context, *GetCustomerByEmailRequest) (*GetCustomerByEmailResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetCustomerByEmail not implemented")
+}
+func (UnimplementedCustomerServiceServer) GetCustomerByID(context.Context, *GetCustomerByIDRequest) (*Customer, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetCustomerByID not implemented")
 }
 func (UnimplementedCustomerServiceServer) mustEmbedUnimplementedCustomerServiceServer() {}
 func (UnimplementedCustomerServiceServer) testEmbeddedByValue()                         {}
@@ -142,6 +158,24 @@ func _CustomerService_GetCustomerByEmail_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CustomerService_GetCustomerByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCustomerByIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CustomerServiceServer).GetCustomerByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CustomerService_GetCustomerByID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CustomerServiceServer).GetCustomerByID(ctx, req.(*GetCustomerByIDRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CustomerService_ServiceDesc is the grpc.ServiceDesc for CustomerService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -156,6 +190,10 @@ var CustomerService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetCustomerByEmail",
 			Handler:    _CustomerService_GetCustomerByEmail_Handler,
+		},
+		{
+			MethodName: "GetCustomerByID",
+			Handler:    _CustomerService_GetCustomerByID_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
