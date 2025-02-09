@@ -1,0 +1,43 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: nginx-rc
+  labels:
+    rc-pod: nginx
+  annotations:
+    describe: "replication controller for nginx pod"
+spec:
+  replicas: 3 # jumlah pod minimal yang akan dijalankan
+  selector:
+    pod-name: nginx # harus sama dengan line 17
+  template: # template untuk membuat pod nya
+    metadata:
+      name: nginx
+      labels:
+        pod-name: nginx # harus sama dengan line 12
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:stable-alpine
+          ports:
+            - containerPort: 80
+          livenessProbe:
+            httpGet:
+              port: 80
+              path: /health
+            initialDelaySeconds: 1
+            periodSeconds: 10
+            failureThreshold: 3
+            successThreshold: 1
+
+
+
+
+# digunakan untuk menselect pod yang dicontroll
+# kubectl create -f replication-controller.yaml
+# kubectl get replicationcontroller
+# kubectl get rc
+
+# delete replication controller
+# kubectl delete rc nginx-rc
+# kubectl delete rc nginx-rc --cascade=false

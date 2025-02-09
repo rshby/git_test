@@ -1,0 +1,51 @@
+# probe
+
+# pengecekan
+# 1. livenes -> ketika ada yg tidak sehat, maka akan merestart pod
+# 2. readiness -> ketika ada yg tidak sehat, maka akan stop traffic yg masuk
+# 3. startup probe -> melakaukan pengecekan di awal saja. aplikasi akan mulai menerima traffic saat startup probe sudah healthy
+
+# mekanisme pengecekan startup probe
+# 1. http GET
+# 2. tcp socket
+# 3. command execute
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-with-probe
+spec:
+  containers:
+    - name: nginx
+      image: nginx:stable-alpine
+      ports:
+        - containerPort: 80
+      livenessProbe:
+        httpGet:
+          port: 80
+          path: /health
+        initialDelaySeconds: 2
+        periodSeconds: 10
+        timeoutSeconds: 1
+        successThreshold: 1
+        failureThreshold: 3
+      readinessProbe:
+        httpGet:
+          port: 80
+          path: /health
+        initialDelaySeconds: 0
+        periodSeconds: 10
+        timeoutSeconds: 1
+        successThreshold: 1
+        failureThreshold: 3
+      startupProbe:
+        httpGet:
+          port: 80
+          path: /
+        initialDelaySeconds: 0
+        periodSeconds: 10
+        timeoutSeconds: 1
+        successThreshold: 1
+        failureThreshold: 3
+
+# kubectl describe pod nginx-with-probe

@@ -1,0 +1,29 @@
+# cron job
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sync-transaction
+spec:
+  jobTemplate:
+    spec:
+      selector:
+          matchLabels:
+            pod-env: stagging
+            pod-name: nginx
+      template:
+        metadata:
+          name: nginx-pod
+          labels:
+            pod-env: stagging
+            pod-name: nginx
+        spec:
+          restartPolicy: Never
+          containers:
+            - name: nginx-container
+              image: nginx:stable-alpine
+              ports:
+                - containerPort: 80
+  schedule: "* * * * *"
+
+# kubectl create -f cron-job.yaml

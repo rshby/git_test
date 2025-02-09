@@ -1,0 +1,29 @@
+# replica set -> newer version of replication controller
+# replica set memiliki label selector yg lebih expressive dibandingkan dengan replicationController yang hanya memiliki label selector secara match
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: nginx-rs
+spec:
+  replicas: 3 # jumlah minimal Pod yang akan dijalankan
+  selector:
+    matchLabels:
+      pod-name: nginx # akan mencari Pod yg memiliki label pod-name=nginx dan memastikan terbuat minimal 3 Pods
+  template: # template yang digunakan untuk membuat Pod nya
+    metadata:
+      name: nginx-pod
+      labels:
+        pod-name: nginx # Pod yg akan dibuat memiliki label pod-name=nginx
+    spec:
+      containers:
+        - name: nginx-container
+          image: nginx:stable-alpine
+          ports:
+            - containerPort: 80
+
+# create replica set
+# kubectl create -f replica-set.yaml
+
+# get replica set
+# kubectl get rs

@@ -1,0 +1,20 @@
+# node selector
+# add label to node
+# kubectl label node [name_node] [key]=[value]
+# kubectl label node node1 gpu=true
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod
+  labels:
+    pod-env: stagging
+    pod-name: nginx
+spec:
+  nodeSelector:
+    gpu: "true" # Pod ini akan dijalankan pada node yg memiliki label gpu=true
+  containers:
+    - name: nginx-container
+      image: nginx:stable-alpine
+      ports:
+        - containerPort: 80

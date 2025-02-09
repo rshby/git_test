@@ -1,0 +1,33 @@
+# matchLabels -> label key dan value harus sama
+# matchExpression ->
+# in -> value label harus ada di value selector
+# NotIn -> value label tidak boleh ada di value selector
+# Exists -> label harus ada
+# NotExists -> label tidak boleh ada
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: nginx-rs-match-expression
+spec:
+  replicas: 3 # jumlah minimal Pods yg akan dijalankan
+  selector:
+    matchLabels:
+      pod-env: stagging # akan mencari Pods yg memiliki label pod-env=stagging
+    matchExpressions: # akan mencari Pods yg memiliki label pod-name in ('nginx') dan memastikan jumlahnya minimal 3 Pods
+      - key: pod-name
+        operator: In
+        values:
+          - nginx
+  template: # template yang akan digunakan untuk membuat Pod
+    metadata:
+      name: nginx-pod
+      labels:
+        pod-name: nginx # pod yang dibuat memiliki label pod-name=nginx
+        pod-env: stagging
+    spec:
+      containers:
+        - name: nginx-container
+          image: nginx:stable-alpine
+          ports:
+            - containerPort: 80

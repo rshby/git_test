@@ -1,0 +1,28 @@
+# job
+# job adalah resource yang digunakan untuk menjalankan Pod yg berjalan hanya sekali lalu berhenti
+# pada job, Pod akan mati jika sudah selesai dijalankan
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: sync-job-title
+spec:
+  completions: 4 # berapa kali Pod dijalankan sampai Job dianggap complete
+  parallelism: 2 # berapa banyak Pod yang dapat jalan secara bersama (paralel)
+  selector:
+    matchLabels:
+      pod-name: nginx
+      pod-env: stagging
+  template: # template yg digunakan untuk membuat Pod
+    metadata:
+      name: nginx-pod
+      labels:
+        pod-env: stagging
+        pod-name: nginx
+    spec:
+      restartPolicy: Never # untuk job, value ini wajib Never
+      containers:
+        - name: nginx-container
+          image: nginx:stable-alpine
+          ports:
+            - containerPort: 80

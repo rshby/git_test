@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nginx-daemon-set
+spec:
+  selector:
+    matchLabels:
+      pod-env: stagging
+      pod-name: nginx
+  template:
+    metadata:
+      name: nginx-pod
+      labels:
+        pod-env: stagging
+        pod-name: nginx
+    spec:
+      containers:
+        - name: nginx-container
+          image: nginx:stable-alpine
+          ports:
+            - containerPort: 80
+
+# kubectl create -f daemon-set.yaml
+# kubectl get daemonset
