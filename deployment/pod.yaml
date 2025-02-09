@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx # nama pod nya
+spec:
+  containers:
+    - name: nginx # nama container yg akan kita buat
+      image: nginx:stable-alpine # nama imagenya
+      ports:
+        - containerPort: 80 # port yg digunakan oleh container nginx, jika kita membuat aplikasi dan running di port 4000, maka di sini diisi 4000
+
+# kubectl create -f pod.yaml
+
+# kubectl get pods
+
+# kubectl get pod -o wide
+
+# kubectl describe pod [pod_name] -> kubectl describe pod nginx

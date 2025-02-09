@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eraspace
+
+# kubectl create -f namespace.yaml
+
+# create pod in a specific namespace
+# kubectl create -f pod.yaml --namespace eraspace
+
+# kubectl get pod --namespace eraspace
+
+# delete namespace
+# kubectl delete namespace [namespace_name]
+# example :
+# kubectl delete namespace eraspace

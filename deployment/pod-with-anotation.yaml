@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-with-annotation
+  annotations:
+    pod-annotation-key1: test
+    pod-desc: lorem ipsum blablabla
+spec:
+  containers:
+    - name: nginx
+      image: nginx:stable-alpine
+      ports:
+        - containerPort: 80
+
+# kubectl create -f pod-with-anotation.yaml
+
+# kubectl describe pod nginx-with-annotation
+
+# add annotation after a pod is created
+# kubectl annotate pod [pod_name] [key]=[value]
+# kubectl annotate pod nginx-with-annotation pod-annotation-key2="hehe"

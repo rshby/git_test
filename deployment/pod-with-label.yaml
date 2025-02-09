@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  - name: nginx
+  - labels: # key:value
+      pod-name: nginx # nginx['pod-name'] -> nginx
+      pod-version: v1 # nginx['pod-version'] -> v1
+      pod-env: production
+      pod-author: reo # nginx['pod-author'] -> reo
+spec:
+  containers:
+    - name: nginx
+      image: nginx:stable-alpine
+      ports:
+        - containerPort: 80
+
+# kubectl create -f pod-with-label.yaml
+
+# kubect get pod --show-labels
+
+# query pod dengan label
+# kubectl get pod -l pod-author=reo
+# kubectl get pod -l pod-env=production, pod-author=reo
+# kubectl get pod -l 'pod-env in (production, stagging)'
