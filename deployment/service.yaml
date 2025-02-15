@@ -1,0 +1,47 @@
+# service adalah resource di kube yang digunakan untuk satu gerbang untuk mengakses  satu pod atau lebih
+# service memiliki IP address dan Port yang tidak pernah berubah selama service itu ada
+# client bisa mengakses service tersebut, dan secara otomatis akan meneruskan ke pod yg ada di belakang service tersebut
+# dengan begini client tidak perlu tahu lokasi tiap Pod, dan Pod bisa bertambah, berkurang, atau berpindah, tanpa harus menunggu client
+
+# bagaimana menentukan Pod untuk service
+# service akan mendistribusikan traffic ke Pod yg ada di belakangnya secara seimbang
+# service akan menggunakan label selector untuk mengetahui pod mana yang akan di belakang service tersebut
+
+# kubectl get service
+
+# create replica set
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: nginx-rs
+spec:
+  selector:
+    matchLabels:
+      pod-name: nginx
+      pod-env: stagging
+  template:
+    metadata:
+      name: nginx-pod
+      labels:
+        pod-env: stagging
+        pod-name: nginx
+    spec:
+      containers:
+        - name: nginx-container
+          image: nginx:stable-alpine
+          ports:
+            - containerPort: 80
+
+---
+# create service
+apiVersion: v1
+kind: Service
+metadata:
+  name : nginx-service # nama servicenya
+spec:
+  selector: # untuk menselect pod mana yg masuk ke dalam service ini
+    pod-env: stagging
+    pod-name: nginx
+  ports:
+    - port: 8080 # port dari servicenya. servicenya akan mengexpose port 8080
+      targetPort: 80 # target port dari Pod, Pod nya mengexpose port berapa
