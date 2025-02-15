@@ -1,0 +1,21 @@
+# kadang ada kebutuhan kita perlu mengakses service keluar
+# tujuanya adalah agar aplikasi dari luar kubernetes cluster bisa mengakses Pod yang berada di belakang service tersebut
+
+# tipe service
+# 1. ClusterIP : mengexpose service di dalam internal kubertenes cluster (default)
+# 2. ExternalName: memetakan service ke external name (misalnya example.com)
+# 3. NodePort : mengexpose service pada setiap IP node dan port yg sama. kita dapat mengakses service ini dari luar cluster melalui <NodeIP>:<NodePort>
+# 4. LoadBalancer: mengexpose service secara external dengan menggunakan load balancer yang disediakan oleh penyedia cloud
+###
+
+# cara untuk mengexpose service
+# 1. dengan menggunakan NodePort, sehingga node akan membuka port yg akan meneruskan request ke service yg dituju
+# 2. dengan menggunakan LoadBalancer, sehingga service bisa diakses via LoadBalancer dan LoadBalancer akan meneruskan request ke NodePort dan dilanjutkan ke service
+# 3. menggunakan inggress. dimana inggress adaah resource yang memang tujuannya untuk mengexpose service. namun ingress hanya beroprasi di level HTTP
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-expose
+  labels:
+    service-name: service-expose
+

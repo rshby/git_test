@@ -1,0 +1,58 @@
+# node port
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-node-port
+  labels:
+    service-name: service-node-port
+spec: # spec dari service nya
+  type: NodePort
+  selector: # Pod mana yg akan dipilih oleh service ini
+    pod-env: stagging
+    pod-name: nginx
+  ports:
+    - port: 80 # port dari servicenya
+      targetPort: 80 # port dari Pod nya (pod nginx)
+      nodePort: 32767 # port dari node
+
+---
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: nginx-rs
+spec:
+  replicas: 3
+  selector:
+    matchLabels: # Pod yg akan dipilih dan dimaintain oleh replica set
+      pod-name: nginx
+      pod-env: stagging
+  template: # template untuk membuat Pod
+    metadata:
+      name: nginx-pod # nama Pod yg akan dibuat
+      labels: # label Pod yg akan dibuat
+        pod-env: stagging
+        pod-name: nginx
+    spec: # container yg akan dijalankan di Pod
+      containers:
+        - name: nginx # nama container yg akan dibuat di dalam Pod
+          image: nginx:stable-alpine # image yg akan dijalankan di dalam Pod
+          ports: # port yg akan digunakan oleh containernya
+            - containerPort: 80
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-node-port # nama dari service nya
+spec:
+  type: NodePort # tipe dari service yg akan dibuat
+  selector: # Pod yg akan diselect dan disambungkan ke service ini
+    pod-name: nginx
+    pod-env: stagging
+  ports:
+    - port: 80 # port yg akan dibuka oleh Service ini
+      targetPort: 80 # port dari Pod yg dipilih. saat mengakses Service ini, maka akan diteruskan ke Pod dengan port ini
+      nodePort: 30001 # port dari node yg akan dibuka
+
+# kubectl create -f service-node-port.yaml

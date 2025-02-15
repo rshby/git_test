@@ -1,0 +1,20 @@
+# untuk mengakses service
+# 1. menggunakan env variable
+# 2. menggunakan DNS
+
+# kubectl create -f service-nginx.yaml
+# kubectl exec [name_pod] -- env
+
+# kubetl exec nginx-curl --env
+
+# kubectl exec -it nginc-curl -- /bin/sh
+
+# selalu diawali nama-service_SERVICE_HOST=10.106.125.220
+# nama_service_SERVICE_PORT=8080
+
+# 2. menggunakan DNS
+# nama-service.nama-namespace.svc.cluster.local
+# example
+# nginx-service.default.svc.cluster.local:8080
+
+# kubectl get endpoints

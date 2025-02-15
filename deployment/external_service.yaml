@@ -1,0 +1,74 @@
+# untuk melihat endpoint
+# kubectl describe service [nama_service]
+# kubectl get endpoints [nama_service]
+
+# external service with domain
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-service-domain
+  labels:
+    service-name: external-service-domain
+spec:
+  type: ExternalName # digunakan untuk mengakses service external
+  externalName: example.com # endpoint dari external service. saat kita mengakses external-service-domain, maka service ini akan meneruskan ke example.com
+  ports:
+    - port: 80
+
+---
+# external service with endpoint
+apiVersion: v1
+kind: Service
+metadata:
+  name: external-service-endpoint # jika kita mengakses service external-service-endpoint, maka dia secara round robin akan meneruskan ke IP 11.11.11.11 dan 22.22.22.22
+  labels:
+    service-name: external-service-endpoint
+spec:
+  ports:
+    - port: 80
+
+---
+# create new endpoint
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: external-service-endpoint # nama ini harus sama dengan nama servicenya, yaitu external-service-endpoint (line 23)
+subsets:
+  - addresses:
+      - ip: 11.11.11.11
+      - ip: 22.22.22.22
+    ports:
+      - port: 80
+
+---
+# example
+apiVersion: v1
+kind: Service
+metadata:
+  name: example-service
+  labels:
+    service-name: example-service
+spec:
+  type: ExternalName
+  externalName: example.com
+  ports:
+    - port: 80
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: curl-pod
+  labels:
+    pod-name: curl-pod
+    pod-env: stagging
+spec:
+  containers:
+    - name: curl
+      image: khannedy/nginx-curl
+      ports:
+        - containerPort: 80
+
+---
+# dari dalam pod curl, kita coba access service example-service. harusnya akan meneruskan ke example.com
+# curl http://example-service.default.svc.cluster.local
