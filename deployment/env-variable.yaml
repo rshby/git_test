@@ -1,0 +1,53 @@
+# environment variable
+# kubernetes juga mendukung env variable untuk Pod
+# hal ini sangat berguna untuk konfigurasi aplikasi, seperti konfigurasi database, dan lain-lain
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-name
+  labels:
+    label-key1: label-value1
+spec:
+  containers:
+    - name: container-name
+      image: image
+      ports:
+        - containerPort: 80
+      env:
+        - name: ENV_NAME
+          value: "ENV_VALUE"
+
+---
+# create replica set
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: app-rs
+  labels:
+    rs-name: app-rs
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      pod-env: stagging
+      pod-name: nodejs-writer
+  template: # template yg akan digunakan untuk membuat Pod
+    metadata:
+      name: nodejs-writer # nama pod yg akan dibuat
+      labels:
+        pod-name: nodejs-writer # label Pod yg akan dibuat
+        pod-env: stagging
+    spec:
+      volumes: # volume yg akan dibuat di Pod
+        - name: hmtl
+          emptyDir: {}
+      containers: # Container yg akan dijalankan di dalam Pod
+        - name: nodejs-writer
+          image: khannedy/nodejs-writer
+          volumeMounts:
+            - mountPath: /app/folder-from-env
+              name: html
+          env: # override ENV Container yg akan dijalankan di dalam Pod
+            - name: HTML_LOCATION
+              value: "/app/folder-from-env"
