@@ -1,0 +1,18 @@
+# service dengan load balancer
+# cloud provider seperti google cloud atau amazone web service biasanya memiliki cloud loadbalancer
+# kubernetes dapat menggunakan LoadBalancer bawaan dari cloud provider sebagai cara untuk mengexpose service
+# LoadBalancer akan melakukan load balancing request ke NodePort
+# tidak bisa ditest di local seperti minikube
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-load-balancer # nama dari Service yg akan dibuat
+spec:
+  type: LoadBalancer
+  selector: # Pod yg akan dipilih dan dimaintain oleh Service ini
+    pod-env: stagging
+    pod-name: nginx
+  ports:
+    - port: 80 # port dari Service yg akan dibuat
+      targetPort: 80 # port dari Pod yg dipilih dan dimaintain oleh Service

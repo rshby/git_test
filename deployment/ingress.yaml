@@ -1,0 +1,58 @@
+# ingress
+# Ingress adalah suatu cara untuk mengexpose Service
+# berbeda dengan load balancer atau node port, jika menggunakan Ingress, client hanya butuh tahu satu lokasi IP address ingress
+# ketika client melakukan request ke Ingress, pemilihan Service nya ditentukan menggunakan hostname dari request
+# Ingress hanya mendukung protocol HTTP, grpc gak bisa
+
+# menjalankan Ingress di minikube
+# minikube addons list
+# minikube addons enable ingress
+# kubectl get pods --namespace kube-system
+# kubectl get ingresses
+
+# masalah saat mengexpose Service
+# 1. jika menggunakan node port
+# maka semua node harus terexpose ke public
+# client harus tau semua IP address dari masing-masing node
+# 2. jika menggunakan Load Balancer
+# maka semua load balancer harus terexpose ke public
+# client harus tau semua IP address Load Balancer
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: service-ingress
+spec:
+  rules:
+    - host: sub.domain.com # host yang digunakan untuk mengakses Ingress ini
+      http:
+        paths:
+          - path: /
+            pathType: prefix
+            backend:
+              service:
+                name: service-name
+                port:
+                  number: 80
+
+---
+# example
+# create replica set
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: nginx-rs
+spec:
+  selector:
+    matchLabels:
+      pod-name: nginx
+      pod-env: stagging
+  template:
+    metadata:
+      name: nginx-pod
+      labels:
+        pod-env: stagging
+        pod-name: nginx
+    spec:
+      containers:
+        - name: nginx-container
