@@ -1,0 +1,43 @@
+# Update Deployment
+# saat melakukan update, secara otomatis Deployment akan membuat Replica Set baru, lalu menyalakan Pod. setelah Pod baru siap, Deploymeny akan menghapus Pod lama secara otomatis
+# ini membuat proses update berjalan seamless, dan tidak terjadi downtime
+
+# create Deploymeny
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs-web # nama Deployment yg akan dibuat
+  labels:
+    name: nodejs-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: nodejs-web # Pod yg akan dimaintaine oleh Replica Set. SELECT by label
+  template:
+    metadata:
+      name: nodejs-web # nama Pod yg akan dibuat
+      labels:
+        name: nodejs-web # Pod yg akan dibuat memiliki label ini
+    spec:
+      containers:
+        - name: nodejs-web # nama Container yg akan dijalankan di dalam Pod
+          image: khannedy/nodejs-web:2 # image yg akan digunakan di Container
+          ports:
+            - containerPort: 3000 # port yg akan digunakan oleh Container
+---
+# create Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodejs-web-service
+  labels:
+    name: nodejs-web-service
+spec:
+  type: NodePort
+  selector:
+    name: nodejs-web
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30001

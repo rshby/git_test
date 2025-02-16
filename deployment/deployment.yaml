@@ -1,0 +1,82 @@
+# deployment
+# resource untuk melakukan deployment aplikasi dan update aplikasi
+# saat membuat deployment, kubernetes otomatis membuatkan Replica Set, yg mana Replica Set akan secara otomatis membuatkan Pod
+# membuat Deployment hampir sama dengan membuat Replica Set
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-name
+  labels:
+    label-key1: label-value1
+  annotations:
+    annotation-key1: "annotation value1"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      label-key1: label-value1
+  template:
+    metadata:
+      name: pod-name
+      labels:
+        label-key1: label-value1
+    spec:
+      containers:
+        - name: container-name
+          image: container-image:latest
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              port: 80
+              path: /ping
+            initialDelaySeconds: 1
+            periodSeconds: 5
+            failureThreshold: 3
+            successThreshold: 1
+            timeoutSeconds: 2
+
+---
+# example
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs-web # nama Deployment yg akan dibuat
+  labels:
+    name: nodejs-web # label dari Deployment yg akan dibuat
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: nodejs-web # Pod yg akan dimaintain adalah Pod yg memiliki label ini, SELECT by label
+  template:
+    metadata:
+      name: nodejs-web # nama Pod yg akan dibuat
+      labels:
+        name: nodejs-web # label Pod yg akan dibuat
+    spec:
+      containers:
+        - name: nodejs-web # nama Container yg akan dibuat di dalam Pod
+          image: khannedy/nodejs-web # image yg digunakan untuk membuat Container ini
+          ports:
+            - containerPort: 3000 # port yg akan digunakan Container ini
+
+---
+# Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodejs-web-service
+  labels:
+    name: nodejs-web-service
+spec:
+  type: NodePort
+  selector:
+    name: nodejs-web
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30001
+
+

@@ -1,0 +1,90 @@
+# downward API
+# bagaimana konfigurasi yg dinamins, seperti informasi Pod dan Node
+# kubernetes memiliki DownWard API. downward api bisa memungkinkan kita bisa mengambil informasi seputar Pod dan Node melalui environment variable
+
+# metadata
+# request.cpu : jumlah CPU yg direquest
+# request.memory : jumlah memory yg direquest
+# limits.cpu : jumlah limit Max CPU
+# limits.memory : jumlah limit Max memory
+# metadata.name : nama Pod
+# metadata.namespace : nama Namespace
+# metadata.uid : Pod ID
+# metadta.labels['<KEY>'] : label Pod
+# metadata.annotations['<KEY>'] : annotation Pod
+# status.PodIP : IP address Pod
+# spec.serviceAccountName : Nama Service Account Pod
+# spec.nodeName : Nama Node
+# status.hostIP : IP Address Node
+
+# example
+# create configmap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nodejs-env-config
+data:
+  APPLICATION: "My Cool Application"
+  VERSION: "1.0.0"
+
+---
+# create Replication Set
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: nodejs-env # nama dari Replication Setnya
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: nodejs-env # Pod yg akan dimaintaine oleh Replication Set ini. select by label
+  template: # template untuk membuat Pod
+    metadata:
+      name: nodejs-env # nama Pod yg akan dibuat
+      labels:
+        name: nodejs-env # Pod yg akan dibuat memiliki label ini
+    spec:
+      containers:
+        - name: nodejs-env # Container yg akan dibuat
+          image: khannedy/nodejs-env
+          ports:
+            - containerPort: 3000 # Container ini akan expose port 3000
+          envFrom:
+            - configMapRef:
+                name: nodejs-env-config # override ENV dengan ConfigMap yg memiliki nama ini
+          env:
+            - name: POD_NAME # override ENV ini, ambil valuenya dari downward API (dinamis, sesuai dengan Pod yg dibuat)
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE # override ENV ini, ambil value dari downward API (dinamis, sesuai dengan Pod yg dibuat)
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.PodIP
+            - name: POD_NODE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.nodeName
+            - name: POD_NODE_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.hostIP
+
+---
+# create Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodejs-env-service
+spec:
+  selector:
+    name: nodejs-env
+  type: NodePort
+  ports:
+    - port: 3000 # port dari Service yg akan dibuka
+      targetPort: 3000 # akan diteruskan ke port Pod
+      nodePort: 31001
