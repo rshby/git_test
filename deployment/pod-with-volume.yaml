@@ -1,0 +1,51 @@
+# volume
+# berkas di dalam container itu tidak permanent, akan terhapus ketika Pod dihapus atau restart
+# Volume: secara sederhana adalah direktori yg dapat diakses Container yg ada di dalam Pod
+
+# Kubernetes mendukung jenis-jenis Volume
+# 1. emptyDir, direktori sederhana yg kosong
+# 2. hostPath, digunakan untuk men-sharing direktori di Node ke Pod
+# 3. gitRepo, direktori yg dibuat pertama kali dengan meng-clone git repository
+# 4. nfs, sharing network file system
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-pod-volume
+  labels:
+    pod-name: nginx-pod-volume
+    pod-env: stagging
+spec:
+  volumes:
+    - name: volume-name
+      emptyDir: {}
+  containers:
+    - name: nginx-container
+      image: nginx:stable-alpine
+      ports:
+        - containerPort: 80
+      volumeMounts:
+        - mountPath: /app/volume
+          name: volume-name
+
+---
+# example
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nodejs-writer
+  labels:
+    pod-env: stagging
+    pod-name: nodejs-writer
+spec:
+  volumes:
+    - name: volume-html
+      emptyDir: {}
+  containers:
+    - name: nodejs-writer
+      image: khannedy/nodejs-writer
+      ports:
+        - containerPort: 3000
+      volumeMounts:
+        - mountPath: /app/html
+          name: volume-html

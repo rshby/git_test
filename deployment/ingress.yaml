@@ -56,3 +56,51 @@ spec:
     spec:
       containers:
         - name: nginx-container
+          image: nginx:stable-alpine
+          ports:
+            - containerPort: 80
+
+---
+# create service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service # nama Service yg akan dibuat
+spec:
+  selector: # Pod yg akan dipilih dan dimasukkan ke dalam scope Service ini
+    pod-name: nginx
+    pod-env: stagging
+  ports:
+    - port: 80 # port dari Service yg akan dibuka
+      targetPort: 80 # port dari Pod yg akan di dalam scope Service ini
+
+---
+# create ingress
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx-ingress # nama Ingress yg akan dibuat
+  labels:
+    ingress-name: nginx-ingress
+spec:
+  rules:
+    - host: nginx.reo.local # endpoint DNS yg dibukan oleh Ingress ini
+      http:
+        paths:
+          - path: /nginx1 # endpoint dengan prefix http://nginx.reo.local/nginx1 akan diteruskan ke Service ini
+            pathType: prefix
+            backend:
+              service:
+                name: nginx-service
+                port:
+                  number: 80
+          - path: /nginx2 # endpoint dengan prefix http://nginx.reo.local.nginx2 aka diteruskan ke Service ini
+            pathType: prefix
+            backend:
+              service:
+                name: nginx-service-2
+                port:
+                  number: 80
+
+---
+# kubectl create -f ingress.yaml

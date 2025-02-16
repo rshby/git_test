@@ -1,0 +1,65 @@
+# sharing volume di kubernetes
+# karena di dalam Pod kita bisa membuat lebih dari satu Container
+# Maka, Volume di Pod pun bisa kita sharing ke beberapa Container
+# Hal ini sangat cocok ketika kita butuh sharing direktori antar container, misal Container pertama membuat file, Container kedua memproses file
+
+# create replica set
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: app-writer-rs
+  labels:
+    rs-name: app-writer-rs
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      pod-name: app-writer
+      pod-env: stagging
+  template: # template untuk membuat Pod nya
+    metadata:
+      name: app-writer
+      labels:
+        pod-env: stagging
+        pod-name: app-writer
+    spec:
+      volumes:
+        - name: volume-html
+          emptyDir: {}
+      containers:
+        - name: nodejs-writer
+          image: khannedy/nodejs-writer
+          volumeMounts:
+            - mountPath: /app/html
+              name: volume-html
+          ports:
+            - containerPort: 3000
+        - name: nginx
+          image: nginx:stable-alpine
+          volumeMounts:
+            - mountPath: /usr/share/nginx/html
+              name: volume-html
+          ports:
+            - containerPort: 80
+
+---
+# create Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-writer-service
+  labels:
+    service-name: app-writer-service
+spec:
+  type: NodePort
+  selector:
+    pod-name: app-writer
+    pod-env: stagging
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30001
+    - port: 3000
+      targetPort: 3000
+
+

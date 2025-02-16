@@ -1,0 +1,57 @@
+# multi container Pod
+# saat menggunakan Docker, kita selalu diajarkan bahwa satu aplikasi adalah satu container
+# di Kube agak sedikit berbeda, saat kita deploy aplikasi kita. maka dia akan disimpan di dalam 1 Pod. kenapa Pod, tidak container? karena sebenarnya di dalam 1 Pod dapat berisi banyak container
+# ini cocok sekali jika memang kita butuh aplikasi yg berjalan di beberapa container dan jika ingin scale, semuanya harus ikut scale
+
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: multi-pod-rs
+  labels:
+    rs-name: multi-pod-rs
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      pod-env: stagging
+      pod-name: nginx
+  template: # template untuk membuat pod
+    metadata:
+      name: nginx-pod-multi-container
+      labels:
+        pod-name: nginx
+        pod-env: stagging
+    spec:
+      containers: # container yg akan ada di dalam Pod, di sini Pod akan berisi 2 container
+        - name: nginx
+          image: nginx:stable-alpine
+          ports:
+            - containerPort: 80
+        - name: nodejs-web
+          image: khannedy/nodejs-web
+          ports:
+            - containerPort: 3000
+
+---
+# create Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-nodejs-service
+  labels:
+    service-name: app-nodejs-service
+spec:
+  type: ClusterIP
+  selector: # Pod yg akan dimasukkan ke dalam Service
+    pod-env: stagging
+    pod-name: nginx
+  ports:
+    - port: 80 # Service membuka port 80
+      targetPort: 80 # port 80 dari Service akan diteruskan ke port 80 dari Pod yg dimaintaine
+      name: nginx
+    - port: 3000 # Service akan membuka port 3000
+      targetPort: 3000 # port 3000 dari Service akan diteruskan ke port 3000 dar Pod yg dimaintaine
+      name: nodejs
+
+---
+# kubectl create -f multi-container-pod.yaml
