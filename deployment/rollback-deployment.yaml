@@ -1,0 +1,56 @@
+# Rollback Deployment
+# kita bisa menggunakan fitur rollout kubernetes untuk rollback Deployment ke versi Deployment sebelumnya
+
+# kubectl rollout history object name -> melihat history rollout
+# kubectl rollout pause object name -> menandai sebagai pause
+# kubectl rollout resume object name -> resume pause
+# kubectl rollout restart object name -> merestart rollout
+# kubectl rollout status object name -> melihat status rollout
+# kubectl rollout undo object name -> undo ke rollout sebelumnya
+
+# create deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs-web # nama Deployment yg akan dibuat
+  labels:
+    name: nodejs-web
+spec:
+  revisionHistoryLimit: 5
+  replicas: 1
+  selector:
+    matchLabels:
+      name: nodejs-web # Pod yg akan dimonitor dan dimaintaine oleh replica set
+  template: # template untuk membuat Pod
+    metadata:
+      name: nodejs-web # nama Pod yg akan dibuat
+      labels:
+        name: nodejs-web # label Pod yg akan dibuat
+    spec:
+      containers: # Container yg akan dijalankan di dalam Pod
+        - name: nodejs-web # nama Container yg akan dijalankan di dalam Pod
+          image: khannedy/nodejs-web:3 # image yg dijalankan di dalam Pod
+          ports:
+            - containerPort: 3000 # port yg dibuka Container
+
+---
+# create service
+apiVersion: v1
+kind: Service
+metadata:
+  name: nodejs-web-service
+  labels:
+    name: nodejs-web-service
+spec:
+  type: NodePort
+  selector:
+    name: nodejs-web # akan Select Pod yg memiliki label ini
+  ports:
+    - port: 3000
+      targetPort: 3000
+      nodePort: 30001
+
+---
+# update deployment
+# kubectl apply -f rollback-deployment.yaml
+

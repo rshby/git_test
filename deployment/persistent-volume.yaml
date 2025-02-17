@@ -1,0 +1,18 @@
+# persistent volume
+# persisten volume sebenarnya hampir mirip dengan volume biasa
+# cara pembuatan persistem volume lebih ribet, namun ada kelebihan jika menggunakan persistent volume
+
+# jenis persistent volume
+# 1. HostPath -> berkas disimpan di node, tidak direkomendasikan di production, hanya untuk testing
+# 2. GCEPersistentDisk -> Google Cloud Persistent Disk
+# 3. AWSElasticBlockStore -> Amazon Web Service Persistent Disk
+# 4. Azure/Azure Disk -> Microsoft Azure Persistent Disk
+# dll
+
+# tahapan membuat persistent volume
+# 1. membuat persistent volume
+# 2. menambahkan persistent volume
+# 3. menambahkan persistent volume clain ke Pod
+
+# kubectl create -f persistent-volume.yaml
+
