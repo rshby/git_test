@@ -1,0 +1,101 @@
+# statefull
+# membuat statefulset sangat mudah, hanya seperti membuat Replica Set
+# namun, statefulset memiliki kemampuan untuk menambahkan Volume Claim Template
+
+# template
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: name-stateful
+  labels:
+    name: name-stateful
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: name-stateful # nama Pod yg akan dimaintain oleh stateful set ini
+  serviceName: name-stateful-service # WAJIB ditulis
+  volumeClaimTemplates: # template yg digunakan untuk membuat Volume
+    - metadata:
+        name: name-stateful-volume-claim # nama dari Volume Claim yg dibuat
+      spec:
+        accessModes:
+          - ReadWriteMany
+        volumeMode: Filesystem
+        resources:
+          requests:
+            storage: 1Gi
+  template: # template yg digunakan untuk membuat Pod
+    metadata:
+      name: name-stateful
+      labels:
+        name: name-stateful
+    spec:
+      containers: # Container yg akan dijalankan di dalam Pod
+        - name: name-stateful
+          image: image/name-stateful
+          volumeMounts:
+            - mountPath: /app/data
+              name: name-stateful-volume-claim
+          ports:
+            - containerPort: 8080
+
+---
+# example
+# create persistent Volume
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nodejs-stateful-volume
+spec:
+  accessModes:
+    - ReadWriteMany
+  capacity:
+    storage: 5Gi
+  hostPath:
+    path: /data/location
+
+---
+# create statefulset
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: nodejs-stateful
+  labels:
+    name: nodejs-stateful
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      name: nodejs-stateful
+  serviceName: nodejs-stateful-service
+  volumeClaimTemplates:
+    - metadata:
+        name: nodejs-stateful-volume-claim
+      spec:
+        accessModes:
+          - ReadWriteMany
+        volumeMode: Filesystem
+        resources:
+          requests:
+            storage: 1Gi
+  template:
+    metadata:
+      name: nodejs-stateful
+      labels:
+        name: nodejs-stateful
+    spec:
+      containers:
+        - name: nodejs-stateful
+          image: khannedy/nodejs-stateful
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+          ports:
+            - containerPort: 8080
+          volumeMounts:
+            - mountPath: /app/data
+              name: nodejs-stateful-volume-claim
+
