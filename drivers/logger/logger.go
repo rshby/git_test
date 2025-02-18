@@ -1,0 +1,25 @@
+package logger
+
+import (
+	runtime "github.com/banzaicloud/logrus-runtime-formatter"
+	"github.com/sirupsen/logrus"
+	"os"
+)
+
+func SetupLogger() {
+	formatter := runtime.Formatter{
+		ChildFormatter: &logrus.TextFormatter{
+			ForceColors:               true,
+			ForceQuote:                true,
+			EnvironmentOverrideColors: true,
+			QuoteEmptyFields:          false,
+			FullTimestamp:             true,
+		},
+		Line: true,
+		File: true,
+	}
+
+	logrus.SetFormatter(&formatter)
+	logrus.SetOutput(os.Stdout)
+	logrus.SetLevel(logrus.InfoLevel)
+}

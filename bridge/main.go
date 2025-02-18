@@ -4,9 +4,12 @@ import (
 	"fmt"
 	"git_test/bridge/computer"
 	"git_test/bridge/printer"
+	"git_test/drivers/logger"
 )
 
 func main() {
+	logger.SetupLogger()
+	
 	// create HP Printer
 	hpPrinter := printer.NewHp()
 
