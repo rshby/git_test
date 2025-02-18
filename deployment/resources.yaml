@@ -1,0 +1,68 @@
+# Computational Resources
+# sebelumnya kita belum membahas tentang computational resources
+# jadi saat membuat Pod, secara default kita akan menggunakan resource yg dimiliki oleh Node dimana Pod berada
+# kadang kita ada kebutuhan untuk membatasi jumlah resource yg digunakan untuk Pod
+# hal ini dilakukan agar tidak terjadi perebutan resource antar Pod
+# jangan sampai jika ada Pod yg sibuk, membuat semua Pod di Node yg sama menjadi lambat karena resourcenya terpakai penuh oleh Pod yg sibuk
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-name
+  labels:
+    name: pod-name
+    label-key1: label-value1
+spec:
+  volumes:
+    - name: volume-name
+      emptyDir: {}
+  containers:
+    - name: container-name
+      image: image-name:latest
+      ports:
+        - containerPort: 80
+      resources:
+        requests:
+          cpu: 1000m
+          memory: 250Mi
+        limits:
+          cpu: 2000m
+          memory: 500Mi
+
+---
+# example
+# create Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs-web
+  labels:
+    name: nodejs-web
+spec:
+  replicas: 3 # Pod akan dimaintaine minimal running 3 Pod
+  selector:
+    matchLabels:
+      name: nodejs-web # Pod yg akan dimaintaine oleh Deploymeny ini. Select by label
+  template: # template yg digunakan untuk membuat Pod
+    metadata:
+      name: nodejs-web # nama Pod yg akan dibuat
+      labels:
+        name: noejs-web # Pod yg dibuat akan memiliki label ini
+    spec:
+      containers:
+        - name: nodejs-web # nama Container yg akan dijalankan di dalam Pod
+          image: khannedy/nodejs-web # Image yg akan dijalankan di Container
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name # ENV ini akan diisi oleh nama Pod yg dibuat (dinamis)
+          ports:
+            - containerPort: 3000 # Container ini akan mengexpose port 3000
+          resources: # maximal resource yg akan digunakan oleh Pod yg dijalankan
+            requests:
+              cpu: 1000m
+              memory: 250Mi
+            limits:
+              cpu: 2000m
+              memory: 500Mi
